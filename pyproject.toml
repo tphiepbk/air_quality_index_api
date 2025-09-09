@@ -1,0 +1,23 @@
+[project]
+name = "air_quality_index_api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Hiep Phuc Thai",email = "itmanagertph@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pandas (>=2.3.2,<3.0.0)",
+    "fastapi[standard] (>=0.116.1,<0.117.0)",
+    "uvicorn (>=0.35.0,<0.36.0)",
+    "virtualenvwrapper (>=6.1.1,<7.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "air_quality_index_api", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
