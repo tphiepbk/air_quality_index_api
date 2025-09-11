@@ -1,3 +1,3 @@
 run:
-	poetry run uvicorn air_quality_index_api.server:app --app-dir src --reload
+	poetry run uvicorn src.air_quality_index_api.server:app --reload
 

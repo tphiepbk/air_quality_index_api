@@ -5,14 +5,12 @@ import time
 from contextlib import asynccontextmanager
 from starlette.middleware.cors import CORSMiddleware
 
-from schema.schema import InferenceVienThamRequest
+from src.schema.schema import InferenceVienThamRequest, TestSchema
 
-from prediction.prediction import Prediction
-from schema.schema import TestSchema
+from src.prediction.prediction import Prediction
 
 class AppState:
-    batcher: Any
-    model: Any
+    prediction: Any
     start_time: float
 
 @asynccontextmanager
@@ -39,9 +37,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-def read_root():
-    return {"hello": "world"}
+@app.get("/status")
+async def get_status():
+    uptime = time.time() - app.state.ctx.start_time
+    return {
+        "status": "OK",
+        "uptime_seconds": uptime
+    }
 
 @app.post(
     "/predict-pm25-using-lstms2s-and-lstm",
@@ -58,9 +60,4 @@ async def predict_pm25_using_lstms2s_and_lstm(req: TestSchema):
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Prediction timed out")
     return outputs
-
-# if ___name__ == "__main__":
-#     port = 8000
-#     #port = int(os.getenv("SERVER_PORT", "8000"))
-#     uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False, workers=1)
 
