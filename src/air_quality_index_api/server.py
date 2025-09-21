@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from fastapi import FastAPI, HTTPException
 from typing import Any
 import asyncio
@@ -5,19 +6,19 @@ import time
 from contextlib import asynccontextmanager
 from starlette.middleware.cors import CORSMiddleware
 
-from src.schema.schema import InferenceVienThamRequest, TestSchema
+from src.schema.schema import VienThamData, InferenceResponse
 
-from src.prediction.prediction import Prediction
+from src.request_handler.request_handler import RequestHandler
 
 class AppState:
-    prediction: Any
+    req_handler: RequestHandler
     start_time: float
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     ctx = AppState
     ctx.start_time = time.time()
-    ctx.prediction = Prediction()
+    ctx.req_handler = RequestHandler()
     app.state.ctx = ctx
     print("Server started")
     yield
@@ -47,17 +48,19 @@ async def get_status():
 
 @app.post(
     "/predict-pm25-using-lstms2s-and-lstm",
+    response_model=InferenceResponse,
     description="test"
 )
-# async def predict_pm25_using_lstms2s_and_lstm(req: InferenceVienThamRequest):
-async def predict_pm25_using_lstms2s_and_lstm(req: TestSchema):
+async def predict_pm25_using_lstms2s_and_lstm(vienthamdata: VienThamData):
     event_loop = asyncio.get_event_loop()
     try:
         outputs = await asyncio.wait_for(
-            event_loop.run_in_executor(None, app.state.ctx.prediction.dummy_action, req),
+            event_loop.run_in_executor(None, app.state.ctx.req_handler.handle, vienthamdata),
             timeout=3600000 / 1000.0
         )
+        res = InferenceResponse(code=200, message="predicted_pm25", data=outputs)
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Prediction timed out")
-    return outputs
+
+    return res
 

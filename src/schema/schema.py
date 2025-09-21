@@ -4,8 +4,7 @@ from typing import Any, List, Optional
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
-class VienThamAttributes(BaseModel):
-    station:           Optional[List[float]] = Field(default=None, description="list of station values, at least 7 values")
+class VienThamData(BaseModel):
     pm25:              Optional[List[float]] = Field(default=None, description="list of daily pm25 values, at least 7 values")
     lat:               Optional[List[float]] = Field(default=None, description="list of lat values, at least 7 values")
     lon:               Optional[List[float]] = Field(default=None, description="list of lon values, at least 7 values")
@@ -26,8 +25,9 @@ class VienThamAttributes(BaseModel):
     ndvi:              Optional[List[float]] = Field(default=None, description="list of ndvi values, at least 7 values")
     aod:               Optional[List[float]] = Field(default=None, description="list of daily aod values, at least 7 values")
 
-class InferenceVienThamRequest(BaseModel):
-    data: dict[str, VienThamAttributes] = Field(..., description="input data to predict")
+#class InferenceVienThamRequest(BaseModel):
+#    n_output: dict[str, VienThamData] = Field(..., description="input data to predict")
+#    vienthamdata: dict[str, VienThamData] = Field(..., description="input data to predict")
 
 class PredictionResponse(BaseModel):
     value_1d: Optional[List[float]] = Field(default=None, description="1 next day predicted values")
@@ -40,4 +40,5 @@ class InferenceResponse(BaseModel):
     data: PredictionResponse = Field(..., description="prediction response")
 
 class TestSchema(BaseModel):
-    data: int
+    value: Optional[List[float]] = Field(..., description="list of test values")
+

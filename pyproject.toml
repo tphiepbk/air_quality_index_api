@@ -12,7 +12,10 @@ dependencies = [
     "fastapi[standard] (>=0.116.1,<0.117.0)",
     "uvicorn (>=0.35.0,<0.36.0)",
     "virtualenvwrapper (>=6.1.1,<7.0.0)",
-    "numpy (>=2.3.3,<3.0.0)"
+    "numpy (>=2.3.3,<3.0.0)",
+    "keras (>=3.11.3,<4.0.0)",
+    "tensorflow (>=2.20.0,<3.0.0)",
+    "scikit-learn (>=1.7.2,<2.0.0)"
 ]
 
 [tool.poetry]
