@@ -7,6 +7,8 @@ from sklearn.linear_model import BayesianRidge
 import pandas as pd
 import numpy as np
 
+from src.logger.logger import info
+
 def mice(df, method=None):
     if method is not None:
         assert method in ["random_forest", "extra_trees"]
@@ -27,32 +29,47 @@ def mice(df, method=None):
     mice_df.loc[:, df_columns] = imputed_value
     return mice_df
 
+def padPastFuture(data: pd.DataFrame, n_past=1, n_future=1):
+    func_name = "padPastFuture()"
+    info("{}: is called", func_name)
+
+    padded_before = pd.DataFrame([data.iloc[0]] * n_past)
+    padded_after = pd.DataFrame([data.iloc[-1]] * (n_future - 1))
+    return pd.concat([padded_before, data, padded_after], axis=0)
+
 def reframePastFuture(df, n_past=1, n_future=1, keep_label_only=False):
+    func_name = "reframePastFuture()"
+    info("{}: is called", func_name)
+
     assert isinstance(df, pd.DataFrame), "df should be a DataFrame"
 
     total_len = len(df)
-    print("total_len = ", total_len)
-    ret_X, ret_y = [], []
+    info("{}: total_len = {}", func_name, total_len)
 
-    for window_start in range(total_len):
-        print(window_start)
-        past_end = window_start + n_past
-        future_end = past_end + n_future
-        print("past_end = ", past_end)
-        print("future_end = ", future_end)
+    # If this case happens, it means the length of input data is exactly n_past
+    if total_len == n_past:
+        return np.expand_dims(df.to_numpy(), axis=0), None
+    else:
+        ret_X, ret_y = [], []
 
-        # If this case happens, it means the length of input data is exactly n_past
-        if future_end > total_len:
-              break
+        for window_start in range(total_len):
+            info("{}: window_start = {}", func_name, window_start)
+            past_end = window_start + n_past
+            future_end = past_end + n_future
+            info("{}: past_end = {}", func_name, past_end)
+            info("{}: future_end = {}", func_name, future_end)
 
-        ret_X.append(df.iloc[window_start:past_end, :])
+            if future_end > total_len:
+                break
+
+            ret_X.append(df.iloc[window_start:past_end, :])
+            if keep_label_only:
+                ret_y.append(df.iloc[past_end:future_end, -1])
+            else:
+                ret_y.append(df.iloc[past_end:future_end, :])
+
         if keep_label_only:
-            ret_y.append(df.iloc[past_end:future_end, -1])
-        else:
-            ret_y.append(df.iloc[past_end:future_end, :])
+            ret_y = np.expand_dims(ret_y, axis=-1)
 
-    if keep_label_only:
-        ret_y = np.expand_dims(ret_y, axis=-1)
-
-    return np.array(ret_X), np.array(ret_y)
+        return np.array(ret_X), np.array(ret_y)
 

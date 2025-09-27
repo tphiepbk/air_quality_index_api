@@ -1,33 +1,51 @@
+import pandas as pd
+
 from src.preprocessor.preprocessor import Preprocessor
 from src.prediction.prediction import PredictionModel
-from src.schema.schema import PredictionResponse
-
-import os
-import pandas as pd
-import numpy as np
+from src.reduction.reduction import ReductionModel
+from src.schema.schema import VienThamResponse
+from src.logger.logger import info
 
 class RequestHandler():
     def __init__(self):
-        self.__df_vientham = None
-        self.__prep = None
-        self.__pred_model = None
+        func_name = "RequestHandler.__init__()"
+        info("{}: is called", func_name)
 
-    def handle(self, vienthamdata):
-        # Create dataframe
-        self.__df_vientham = pd.DataFrame(vienthamdata.model_dump())
+    def handleVienThamRequest(self, vientham_request, reduction_model_name, prediction_model_name):
+        # Logger
+        func_name = "RequestHandler.handleVienThamRequest()"
+        info("{}: is called", func_name)
+
+        # Read the VienTham request
+        n_future = vientham_request.n_future
+        df_vientham = pd.DataFrame(vientham_request.data.model_dump())
 
         # Preprocess data
-        self.__prep = Preprocessor(n_past=7, n_future=1)
-        scaled_data, label_scaler = self.__prep.execute(self.__df_vientham)
-        scaled_data = np.expand_dims(scaled_data, axis=0)
-        print(scaled_data.shape)
+        X_scaled, y_scaled = Preprocessor(data_type="aod").execute(input_data=df_vientham)
+        info("{}: X_scaled.shape = {}", func_name, X_scaled.shape)
+        info("{}: X_scaled = \n{}", func_name, X_scaled)
 
-        # Predict
-        pred_model_path = os.path.join("models", "prediction", "aod_LSTMPrediction_no_dim_reduction.keras")
-        self.__pred_model = PredictionModel(pred_model_path)
-        predicted_pm25 = self.__pred_model.predict(scaled_data)[0]
+        # Reduction model
+        X_scaled_encoded = ReductionModel(data=X_scaled,
+                                          data_type="aod",
+                                          n_future=n_future,
+                                          reduction_model_name=reduction_model_name).encode()
+        info("{}: X_scaled_encoded.shape = {}", func_name, X_scaled_encoded.shape)
+        info("{}: X_scaled_encoded = \n{}", func_name, X_scaled_encoded)
+
+        # Prediction model
+        predicted_pm25 = PredictionModel(feature_data=X_scaled_encoded,
+                                         label_data=y_scaled,
+                                         data_type="aod",
+                                         n_future=n_future,
+                                         reduction_model_name=reduction_model_name,
+                                         prediction_model_name=prediction_model_name).predict()
+        info("{}: predicted_pm25.shape = \n{}", func_name, predicted_pm25.shape)
+        info("{}: predicted_pm25 = \n{}", func_name, predicted_pm25)
 
         # Proceed the result
-        res = PredictionResponse(value_1d=predicted_pm25, value_2d=[], value_3d=[])
-        return res
+        return VienThamResponse(data=predicted_pm25)
+
+    def handleCMAQRequest(self, cmaq_request):
+        pass
 

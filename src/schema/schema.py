@@ -4,7 +4,8 @@ from typing import Any, List, Optional
 from typing import Optional, List
 from pydantic import BaseModel, Field
 
-class VienThamData(BaseModel):
+class VienThamInputData(BaseModel):
+    station:           Optional[List[float]] = Field(default=None, description="list of station values, at least 7 values")
     pm25:              Optional[List[float]] = Field(default=None, description="list of daily pm25 values, at least 7 values")
     lat:               Optional[List[float]] = Field(default=None, description="list of lat values, at least 7 values")
     lon:               Optional[List[float]] = Field(default=None, description="list of lon values, at least 7 values")
@@ -25,20 +26,26 @@ class VienThamData(BaseModel):
     ndvi:              Optional[List[float]] = Field(default=None, description="list of ndvi values, at least 7 values")
     aod:               Optional[List[float]] = Field(default=None, description="list of daily aod values, at least 7 values")
 
-#class InferenceVienThamRequest(BaseModel):
-#    n_output: dict[str, VienThamData] = Field(..., description="input data to predict")
-#    vienthamdata: dict[str, VienThamData] = Field(..., description="input data to predict")
+class VienThamRequest(BaseModel):
+    n_future: int = Field(default=None, description="n_future")
+    data: VienThamInputData = Field(default=None, description="VienTham input data")
 
-class PredictionResponse(BaseModel):
-    value_1d: Optional[List[float]] = Field(default=None, description="1 next day predicted values")
-    value_2d: Optional[List[float]] = Field(default=None, description="2 next days predicted values")
-    value_3d: Optional[List[float]] = Field(default=None, description="3 next days predicted values")
+class VienThamResponse(BaseModel):
+    data: Optional[List[float]] = Field(default=None, description="List of daily predicted values")
 
-class InferenceResponse(BaseModel):
-    code: int = Field(..., description="error code. 0 means success otherwise means fail")
-    message: str  = Field(..., description="error message")
-    data: PredictionResponse = Field(..., description="prediction response")
+class CMAQInputData(BaseModel):
+    pm25:    Optional[List[float]] = Field(default=None, description="list of hourly pm25 values, at least 24 values")
+    pm10:    Optional[List[float]] = Field(default=None, description="list of hourly pm10 values, at least 24 values")
+    o3:      Optional[List[float]] = Field(default=None, description="list of hourly o3 values, at least 24 values")
+    so2:     Optional[List[float]] = Field(default=None, description="list of hourly so2 values, at least 24 values")
+    no2:     Optional[List[float]] = Field(default=None, description="list of hourly no2 values, at least 24 values")
+    station: Optional[List[float]] = Field(default=None, description="list of station values, at least 24 values")
+    no:      Optional[List[float]] = Field(default=None, description="list of hourly no values, at least 24 values")
 
-class TestSchema(BaseModel):
-    value: Optional[List[float]] = Field(..., description="list of test values")
+class CMAQRequest(BaseModel):
+    n_future: int = Field(default=None, description="n_future")
+    data: CMAQInputData = Field(default=None, description="VienTham input data")
+
+class CMAQResponse(BaseModel):
+    data: Optional[List[float]] = Field(default=None, description="List of hourly predicted values")
 

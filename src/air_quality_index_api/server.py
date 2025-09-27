@@ -6,7 +6,7 @@ import time
 from contextlib import asynccontextmanager
 from starlette.middleware.cors import CORSMiddleware
 
-from src.schema.schema import VienThamData, InferenceResponse
+from src.schema.schema import CMAQRequest, VienThamResponse, VienThamRequest, CMAQResponse
 
 from src.request_handler.request_handler import RequestHandler
 
@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(
-    title="AQI PM2.5 prediction from VienTham data",
+    title="Air Quality Index API",
     verison="1.0.0",
     lifespan=lifespan
 )
@@ -47,18 +47,41 @@ async def get_status():
     }
 
 @app.post(
-    "/predict-pm25-using-lstms2s-and-lstm",
-    response_model=InferenceResponse,
-    description="test"
+    "/predict-pm25-from-vientham-using-lstms2s-lstm",
+    response_model=VienThamResponse,
+    description="Predict PM2.5 values from VienTham data using LSTM-Seq2Seq and LSTM models"
 )
-async def predict_pm25_using_lstms2s_and_lstm(vienthamdata: VienThamData):
+async def predict_pm25_from_vientham_using_lstms2s_lstm(vientham_request: VienThamRequest):
     event_loop = asyncio.get_event_loop()
+    reduction_model_name = "LSTMSeq2SeqReduction"
+    prediction_model_name = "LSTMPrediction"
     try:
-        outputs = await asyncio.wait_for(
-            event_loop.run_in_executor(None, app.state.ctx.req_handler.handle, vienthamdata),
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleVienThamRequest,
+                                       vientham_request,
+                                       reduction_model_name,
+                                       prediction_model_name),
             timeout=3600000 / 1000.0
         )
-        res = InferenceResponse(code=200, message="predicted_pm25", data=outputs)
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res
+
+@app.post(
+    "/predict-no-from-cmaq",
+    response_model=CMAQResponse,
+    description="Predict NO values from CMAQ data"
+)
+async def predict_no_from_cmaq(cmaq_request: CMAQRequest):
+    event_loop = asyncio.get_event_loop()
+    try:
+        prediction_result = await asyncio.wait_for(
+            event_loop.run_in_executor(None, app.state.ctx.req_handler.handleCMAQRequest, cmaq_request),
+            timeout=3600000 / 1000.0
+        )
+        res = CMAQResponse(code=200, data=prediction_result)
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Prediction timed out")
 
