@@ -14,8 +14,10 @@ class PredictionModel:
                  n_future=1,
                  reduction_model_name="LSTMSeq2SeqReduction",
                  prediction_model_name="LSTMPrediction"):
+        # Logger
         func_name = "PredictionModel.__init__()"
         info("{}: is called", func_name)
+
         self.__feature_data = feature_data
         self.__label_data = label_data
         self.__n_future = n_future
@@ -33,8 +35,10 @@ class PredictionModel:
         # Search and load model
         model_path = glob.glob(f"models/prediction/{model_pattern}*.keras")[0]
         self.__model = load_model(model_path)
+        info("{}: loaded model {}", func_name, model_path)
 
     def predict(self):
+        # Logger
         func_name = "PredictionModel.predict()"
         info("{}: is called", func_name)
 
@@ -46,6 +50,7 @@ class PredictionModel:
         reframed_combined_data, _ = reframePastFuture(combined_data, n_past=7, n_future=self.__n_future)
         info("{}: reframed_combined_data = \n{}", func_name, reframed_combined_data)
 
+        # Prediction
         print(self.__model.summary())
         return self.__model.predict(reframed_combined_data)
 

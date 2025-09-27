@@ -9,6 +9,7 @@ class ReductionModel:
                  data_type="aod",
                  n_future=1,
                  reduction_model_name="LSTMSeq2SeqReduction"):
+        # Logger
         func_name = "ReductionModel.__init__()"
         info("{}: is called", func_name)
 
@@ -25,6 +26,7 @@ class ReductionModel:
         # Search and load model
         model_path = glob.glob(f"models/reduction/{model_pattern}*.keras")[0]
         self.__model = load_model(model_path)
+        info("{}: loaded model {}", func_name, model_path)
 
 
     def encode(self):
@@ -39,6 +41,7 @@ class ReductionModel:
         info("{}: reframed_data.shape = {}", func_name, reframed_data.shape)
         info("{}: reframed_data = \n{}", func_name, reframed_data)
 
+        # Prediction
         print(self.__model.summary())
         return self.__model.predict(reframed_data)
 

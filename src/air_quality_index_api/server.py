@@ -70,6 +70,52 @@ async def predict_pm25_from_vientham_using_lstms2s_lstm(vientham_request: VienTh
     return res
 
 @app.post(
+    "/predict-pm25-from-vientham-using-grus2s-lstm",
+    response_model=VienThamResponse,
+    description="Predict PM2.5 values from VienTham data using GRU-Seq2Seq and LSTM models"
+)
+async def predict_pm25_from_vientham_using_grus2s_lstm(vientham_request: VienThamRequest):
+    event_loop = asyncio.get_event_loop()
+    reduction_model_name = "GRUSeq2SeqReduction"
+    prediction_model_name = "LSTMPrediction"
+    try:
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleVienThamRequest,
+                                       vientham_request,
+                                       reduction_model_name,
+                                       prediction_model_name),
+            timeout=3600000 / 1000.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res
+
+@app.post(
+    "/predict-pm25-from-vientham-using-cnnlstms2s-lstm",
+    response_model=VienThamResponse,
+    description="Predict PM2.5 values from VienTham data using CNNLSTM-Seq2Seq and LSTM models"
+)
+async def predict_pm25_from_vientham_using_cnnlstms2s_lstm(vientham_request: VienThamRequest):
+    event_loop = asyncio.get_event_loop()
+    reduction_model_name = "CNNLSTMSeq2SeqReduction"
+    prediction_model_name = "LSTMPrediction"
+    try:
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleVienThamRequest,
+                                       vientham_request,
+                                       reduction_model_name,
+                                       prediction_model_name),
+            timeout=3600000 / 1000.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res
+
+@app.post(
     "/predict-no-from-cmaq",
     response_model=CMAQResponse,
     description="Predict NO values from CMAQ data"
