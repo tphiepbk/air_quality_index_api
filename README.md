@@ -14,12 +14,14 @@ make build-server
 make run-server
 ```
 
+The above commands will build and run server with default values for below options
+
 Available options:
 
-* PORT
-* IMAGE_NAME
-* IMAGE_TAG
-* CONTAINER_NAME
+* PORT (default: 8000)
+* IMAGE_NAME (default: air_quality_index_api)
+* IMAGE_TAG (default: latest)
+* CONTAINER_NAME (default: air_quality_index_api)
 
 Example:
 
