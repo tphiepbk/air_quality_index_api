@@ -1,10 +1,12 @@
 import glob
+
 import pandas as pd
 
 from keras.models import load_model
 
 from src.logger.logger import info
-from src.preprocessor.data_utils import reframePastFuture, padPastFuture
+from src.preprocessor.data_utils import reframePastFuture
+from src.preprocessor.preprocessor import Preprocessor
 
 # Now we only have one model to predict which is LSTM
 # But we have different reduction model and n_future
@@ -52,5 +54,15 @@ class PredictionModel:
 
         # Prediction
         print(self.__model.summary())
-        return self.__model.predict(reframed_combined_data)
+        prediced_values = self.__model.predict(reframed_combined_data)
+        info("predicted_values.type {}", type(prediced_values))
+        info("predicted_values.shape {}", prediced_values.shape)
+
+        # Reshape and inverse transform
+        # The predicted values have shape (1, n_future, 1), reshape it
+        predicted_values_reshaped = prediced_values.reshape(-1, 1)
+        inverted_predicted_values = Preprocessor(data_type="aod").inverse_transform(predicted_values_reshaped)
+
+        # Results
+        return inverted_predicted_values
 

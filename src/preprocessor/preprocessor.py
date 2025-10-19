@@ -48,6 +48,12 @@ class Preprocessor:
 
         return input_data_imputed
 
+    def inverse_transform(self, input_data):
+        func_name = "Preprocessor.inverse_transform()"
+        info("{}: is called", func_name)
+
+        return self.__label_scaler.inverse_transform(input_data)
+
     def execute(self, input_data: pd.DataFrame):
         func_name = "Preprocessor.execute()"
         info("{}: is called", func_name)

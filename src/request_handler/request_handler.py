@@ -42,12 +42,9 @@ class RequestHandler():
                                          prediction_model_name=prediction_model_name).predict()
         info("{}: predicted_pm25.shape = \n{}", func_name, predicted_pm25.shape)
         info("{}: predicted_pm25 = \n{}", func_name, predicted_pm25)
-        predicted_pm25_reshaped = predicted_pm25.reshape(-1)
-        info("{}: predicted_pm25_reshaped.shape = \n{}", func_name, predicted_pm25_reshaped.shape)
-        info("{}: predicted_pm25_reshaped = \n{}", func_name, predicted_pm25_reshaped)
 
         # Proceed the result
-        return VienThamResponse(data=predicted_pm25_reshaped)
+        return VienThamResponse(data=predicted_pm25)
 
     def handleCMAQRequest(self, cmaq_request):
         pass
