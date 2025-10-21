@@ -1,11 +1,9 @@
 import pandas as pd
 import numpy as np
-import copy
 import os
 import joblib
 
-from src.preprocessor.data_utils import mice 
-from sklearn.preprocessing import MinMaxScaler
+from src.preprocessor.data_utils import mice
 from src.logger.logger import info
 
 class Preprocessor:
@@ -14,7 +12,7 @@ class Preprocessor:
         info("{}: is called", func_name)
 
         self.__data_type = data_type
-        self.__feature_scaler = joblib.load(os.path.join("models", "scaler", f"{self.__data_type}_feature_scaler.pkl"))
+        self.__feature_scaler = joblib.load(os.path.join("models", "scaler", f"{self.__data_type}_features_scaler.pkl"))
         self.__label_scaler = joblib.load(os.path.join("models", "scaler", f"{self.__data_type}_label_scaler.pkl"))
 
     # Split dataset into features and label

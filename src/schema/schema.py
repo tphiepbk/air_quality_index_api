@@ -33,12 +33,12 @@ class VienThamResponse(BaseModel):
     data: Optional[List[float]] = Field(default=None, description="List of daily predicted values")
 
 class CMAQInputData(BaseModel):
-    pm25:    Optional[List[float]] = Field(default=None, description="list of hourly pm25 values, 24 values")
-    pm10:    Optional[List[float]] = Field(default=None, description="list of hourly pm10 values, 24 values")
-    o3:      Optional[List[float]] = Field(default=None, description="list of hourly o3 values, 24 values")
-    so2:     Optional[List[float]] = Field(default=None, description="list of hourly so2 values, 24 values")
-    no2:     Optional[List[float]] = Field(default=None, description="list of hourly no2 values, 24 values")
-    no:      Optional[List[float]] = Field(default=None, description="list of hourly no values, 24 values")
+    pm25:    Optional[List[float]] = Field(default=None, description="list of hourly pm25 values, 168 values")
+    pm10:    Optional[List[float]] = Field(default=None, description="list of hourly pm10 values, 168 values")
+    o3:      Optional[List[float]] = Field(default=None, description="list of hourly o3 values, 168 values")
+    so2:     Optional[List[float]] = Field(default=None, description="list of hourly so2 values, 168 values")
+    no2:     Optional[List[float]] = Field(default=None, description="list of hourly no2 values, 168 values")
+    no:      Optional[List[float]] = Field(default=None, description="list of hourly no values, 168 values")
 
 class CMAQRequest(BaseModel):
     n_future: int = Field(default=None, description="n_future")

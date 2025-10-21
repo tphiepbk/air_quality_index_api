@@ -53,11 +53,11 @@ def reframePastFuture(df, n_past=1, n_future=1, keep_label_only=False):
         ret_X, ret_y = [], []
 
         for window_start in range(total_len):
-            info("{}: window_start = {}", func_name, window_start)
+            # info("{}: window_start = {}", func_name, window_start)
             past_end = window_start + n_past
             future_end = past_end + n_future
-            info("{}: past_end = {}", func_name, past_end)
-            info("{}: future_end = {}", func_name, future_end)
+            # info("{}: past_end = {}", func_name, past_end)
+            # info("{}: future_end = {}", func_name, future_end)
 
             if future_end > total_len:
                 break

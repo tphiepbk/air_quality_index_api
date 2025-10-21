@@ -13,6 +13,7 @@ from src.preprocessor.preprocessor import Preprocessor
 class PredictionModel:
     def __init__(self, feature_data, label_data,
                  data_type="aod",
+                 n_past=7,
                  n_future=1,
                  reduction_model_name="LSTMSeq2SeqReduction",
                  prediction_model_name="LSTMPrediction"):
@@ -22,6 +23,7 @@ class PredictionModel:
 
         self.__feature_data = feature_data
         self.__label_data = label_data
+        self.__n_past = n_past
         self.__n_future = n_future
         self.__reduction_model_name = reduction_model_name
         self.__prediction_model_name = prediction_model_name
@@ -49,7 +51,7 @@ class PredictionModel:
         info("{}: combined_data = \n{}", func_name, combined_data)
 
         # Reframe data
-        reframed_combined_data, _ = reframePastFuture(combined_data, n_past=7, n_future=self.__n_future)
+        reframed_combined_data, _ = reframePastFuture(combined_data, self.__n_past, self.__n_future)
         info("{}: reframed_combined_data = \n{}", func_name, reframed_combined_data)
 
         # Prediction
@@ -61,7 +63,7 @@ class PredictionModel:
         # Reshape and inverse transform
         # The predicted values have shape (1, n_future, 1), reshape it
         predicted_values_reshaped = prediced_values.reshape(-1, 1)
-        inverted_predicted_values = Preprocessor(data_type="aod").inverse_transform(predicted_values_reshaped)
+        inverted_predicted_values = Preprocessor(data_type=self.__data_type).inverse_transform(predicted_values_reshaped)
 
         # Results
         return inverted_predicted_values

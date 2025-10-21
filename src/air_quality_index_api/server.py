@@ -116,18 +116,23 @@ async def predict_pm25_from_vientham_using_cnnlstms2s_lstm(vientham_request: Vie
     return res
 
 @app.post(
-    "/predict-no-from-cmaq",
+    "/predict-no-from-cmaq-using-lstms2s-lstm",
     response_model=CMAQResponse,
-    description="Predict NO values from CMAQ data"
+    description="Predict NO values from CMAQ data using LSTM-Seq2Seq and LSTM models"
 )
-async def predict_no_from_cmaq(cmaq_request: CMAQRequest):
+async def predict_no_from_cmaq_using_lstms2s_lstm(cmaq_request: CMAQRequest):
     event_loop = asyncio.get_event_loop()
+    reduction_model_name = "LSTMSeq2SeqReduction"
+    prediction_model_name = "LSTMPrediction"
     try:
-        prediction_result = await asyncio.wait_for(
-            event_loop.run_in_executor(None, app.state.ctx.req_handler.handleCMAQRequest, cmaq_request),
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleCMAQRequest,
+                                       cmaq_request,
+                                       reduction_model_name,
+                                       prediction_model_name),
             timeout=3600000 / 1000.0
         )
-        res = CMAQResponse(code=200, data=prediction_result)
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Prediction timed out")
 

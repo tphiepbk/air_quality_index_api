@@ -7,6 +7,7 @@ from src.logger.logger import info
 class ReductionModel:
     def __init__(self, data,
                  data_type="aod",
+                 n_past=7,
                  n_future=1,
                  reduction_model_name="LSTMSeq2SeqReduction"):
         # Logger
@@ -14,6 +15,7 @@ class ReductionModel:
         info("{}: is called", func_name)
 
         self.__data = data
+        self.__n_past = n_past
         self.__n_future = n_future
         self.__reduction_model_name = reduction_model_name
         self.__data_type = data_type
@@ -35,9 +37,9 @@ class ReductionModel:
         info("{}: is called", func_name)
 
         # Pad and reframe data
-        padded_data = padPastFuture(self.__data, n_past=7, n_future=7)
+        padded_data = padPastFuture(self.__data, self.__n_past, self.__n_future)
         info("{}: padded_data.shape = {}", func_name, padded_data.shape)
-        reframed_data, _ = reframePastFuture(padded_data, n_past=7, n_future=7)
+        reframed_data, _ = reframePastFuture(padded_data, self.__n_past, self.__n_future)
         info("{}: reframed_data.shape = {}", func_name, reframed_data.shape)
         info("{}: reframed_data = \n{}", func_name, reframed_data)
 
