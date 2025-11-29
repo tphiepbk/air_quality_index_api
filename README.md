@@ -1,4 +1,8 @@
-# How to run the server locally ?
+# Air Quality Index API
+
+Predict the polluted gas (CO, SO2, NO, ...) and PM2.5 in Ho Chi Minh City using Deep Learning models
+
+## How to run the server locally ?
 
 This requires **poetry** pip packages to be installed, then all poetry dependencies
 
@@ -7,7 +11,7 @@ poetry install
 make run-local
 ```
 
-# How to build and run server ?
+## How to build and run server ?
 
 ```
 make build-server
@@ -29,3 +33,7 @@ Example:
 make build-server PORT=8080 IMAGE_NAME=test IMAGE_TAG=test
 make run-server CONTAINER_NAME=testcontainer PORT=8080 IMAGE_NAME=test IMAGE_TAG=test
 ```
+
+## Online repository
+
+The Docker image is available at: <https://hub.docker.com/repository/docker/tphiepbk/air_quality_index_api/general>
