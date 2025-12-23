@@ -47,3 +47,19 @@ class CMAQRequest(BaseModel):
 class CMAQResponse(BaseModel):
     data: Optional[List[float]] = Field(default=None, description="List of hourly predicted values")
 
+class QuanTracInputData(BaseModel):
+    date:        Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
+    no2:         Optional[List[float]] = Field(default=None, description="list of no2 values, 73 values")
+    pm25:        Optional[List[float]] = Field(default=None, description="list of pm25 values, 73 values")
+    o3:          Optional[List[float]] = Field(default=None, description="list of o3 values, 73 values")
+    co:          Optional[List[float]] = Field(default=None, description="list of co values, 73 values")
+    temperature: Optional[List[float]] = Field(default=None, description="list of temperature values, 73 values")
+    humid:       Optional[List[float]] = Field(default=None, description="list of humid values, 73 values")
+    station_id:  Optional[List[int]] = Field(default=None, description="list of station values, 73 values")
+
+class QuanTracRequest(BaseModel):
+    data: QuanTracInputData = Field(default=None, description="QuanTrac input data")
+
+class QuanTracResponse(BaseModel):
+    data: Optional[List[float]] = Field(default=None, description="List of 72 predicted values")
+

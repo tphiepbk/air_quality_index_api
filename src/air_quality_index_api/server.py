@@ -1,12 +1,10 @@
-from dataclasses import dataclass
 from fastapi import FastAPI, HTTPException
-from typing import Any
 import asyncio
 import time
 from contextlib import asynccontextmanager
 from starlette.middleware.cors import CORSMiddleware
 
-from src.schema.schema import CMAQRequest, VienThamResponse, VienThamRequest, CMAQResponse
+from src.schema.schema import CMAQRequest, VienThamResponse, VienThamRequest, CMAQResponse, QuanTracRequest, QuanTracResponse
 
 from src.request_handler.request_handler import RequestHandler
 
@@ -131,6 +129,26 @@ async def predict_no_from_cmaq_using_lstms2s_lstm(cmaq_request: CMAQRequest):
                                        cmaq_request,
                                        reduction_model_name,
                                        prediction_model_name),
+            timeout=3600000 / 1000.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res
+
+@app.post(
+    "/predict-no2-from-quantrac-using-lightgbm",
+    response_model=CMAQResponse,
+    description="Predict NO values from CMAQ data using LSTM-Seq2Seq and LSTM models"
+)
+async def predict_no2_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
+    event_loop = asyncio.get_event_loop()
+    try:
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleQuanTracRequest,
+                                       quantrac_request,
+                                       "NO2_quantrac"),
             timeout=3600000 / 1000.0
         )
     except asyncio.TimeoutError:
