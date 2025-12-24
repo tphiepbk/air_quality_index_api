@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import pickle
+import numpy as np
 
 import lightgbm as lgb
 
@@ -129,6 +130,8 @@ class RequestHandler():
         LAG_STEPS = [3, 6, 12, 24, 48, 72]
         ROLL_WINDOWS = [3, 6, 12, 24, 48, 72]
         HORIZONS = [1, 24, 48, 72]
+
+        # Model path
         model_path = os.path.join("models", "lightgbm")
 
         # Processing
@@ -150,6 +153,7 @@ class RequestHandler():
         # Drop station and date before prediciting
         df_final = df_embedded.drop(columns=["station_id", "date", target_col])
 
+        # Start the prediction
         predicted_values = []
         for horizon_h in HORIZONS:
             model = lgb.Booster(model_file=os.path.join(model_path, f"{target_col}_lightgbm_{horizon_h}h"))
@@ -157,6 +161,14 @@ class RequestHandler():
             print(f"Horizon: {horizon_h}h - predicted: {predicted_value}")
             predicted_values.append(predicted_value)
 
+        # Create the series of 72 values
+        padded_predicted_values = np.full(shape=72, fill_value=np.nan)
+        for horizon_h, value in zip(HORIZONS, predicted_values):
+            padded_predicted_values[horizon_h-1] = value
+        info("{}: padded_predicted_values: \n{}", func_name, padded_predicted_values)
+        filled_predicted_values = pd.Series(padded_predicted_values).ffill().to_numpy()
+        info("{}: filled_predicted_values: \n{}", func_name, filled_predicted_values)
+
         # Proceed the result
-        return QuanTracResponse(data=predicted_values)
+        return QuanTracResponse(data=filled_predicted_values)
 
