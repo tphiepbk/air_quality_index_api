@@ -1,10 +1,11 @@
+import re
 from fastapi import FastAPI, HTTPException
 import asyncio
 import time
 from contextlib import asynccontextmanager
 from starlette.middleware.cors import CORSMiddleware
 
-from src.schema.schema import CMAQRequest, CMAQResponse, VienThamResponse, VienThamRequest, QuanTracRequest, QuanTracResponse, QuanTracSO2Request
+from src.schema.schema import NOCMAQRequest, PredictionResponse, CMAQRequest, VienThamRequest, QuanTracRequest, QuanTracSO2Request
 
 from src.request_handler.request_handler import RequestHandler
 
@@ -46,7 +47,7 @@ async def get_status():
 
 @app.post(
     "/predict-pm25-from-vientham-using-lstms2s-lstm",
-    response_model=VienThamResponse,
+    response_model=PredictionResponse,
     description="Predict PM2.5 values from VienTham data using LSTM-Seq2Seq and LSTM models"
 )
 async def predict_pm25_from_vientham_using_lstms2s_lstm(vientham_request: VienThamRequest):
@@ -69,7 +70,7 @@ async def predict_pm25_from_vientham_using_lstms2s_lstm(vientham_request: VienTh
 
 @app.post(
     "/predict-pm25-from-vientham-using-grus2s-lstm",
-    response_model=VienThamResponse,
+    response_model=PredictionResponse,
     description="Predict PM2.5 values from VienTham data using GRU-Seq2Seq and LSTM models"
 )
 async def predict_pm25_from_vientham_using_grus2s_lstm(vientham_request: VienThamRequest):
@@ -92,7 +93,7 @@ async def predict_pm25_from_vientham_using_grus2s_lstm(vientham_request: VienTha
 
 @app.post(
     "/predict-pm25-from-vientham-using-cnnlstms2s-lstm",
-    response_model=VienThamResponse,
+    response_model=PredictionResponse,
     description="Predict PM2.5 values from VienTham data using CNNLSTM-Seq2Seq and LSTM models"
 )
 async def predict_pm25_from_vientham_using_cnnlstms2s_lstm(vientham_request: VienThamRequest):
@@ -115,7 +116,7 @@ async def predict_pm25_from_vientham_using_cnnlstms2s_lstm(vientham_request: Vie
 
 @app.post(
     "/predict-no-from-cmaq-using-lstms2s-lstm",
-    response_model=CMAQResponse,
+    response_model=PredictionResponse,
     description="Predict NO values from CMAQ data using LSTM-Seq2Seq and LSTM models"
 )
 async def predict_no_from_cmaq_using_lstms2s_lstm(cmaq_request: CMAQRequest):
@@ -138,16 +139,16 @@ async def predict_no_from_cmaq_using_lstms2s_lstm(cmaq_request: CMAQRequest):
 
 @app.post(
     "/predict-no2-from-quantrac-using-lightgbm",
-    response_model=QuanTracResponse,
+    response_model=PredictionResponse,
     description="Predict NO2 values from QuanTrac data using LightGBM models"
 )
-async def predict_no2_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
+async def predict_no2_from_quantrac_using_lightgbm(request: QuanTracRequest):
     event_loop = asyncio.get_event_loop()
     try:
         res = await asyncio.wait_for(
             event_loop.run_in_executor(None,
-                                       app.state.ctx.req_handler.handleQuanTracRequest,
-                                       quantrac_request,
+                                       app.state.ctx.req_handler.handleLightGBMRequest,
+                                       request,
                                        "NO2_quantrac"),
             timeout=3600000 / 1000.0
         )
@@ -158,16 +159,16 @@ async def predict_no2_from_quantrac_using_lightgbm(quantrac_request: QuanTracReq
 
 @app.post(
     "/predict-o3-from-quantrac-using-lightgbm",
-    response_model=QuanTracResponse,
+    response_model=PredictionResponse,
     description="Predict O3 values from QuanTrac data using LightGBM models"
 )
-async def predict_o3_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
+async def predict_o3_from_quantrac_using_lightgbm(request: QuanTracRequest):
     event_loop = asyncio.get_event_loop()
     try:
         res = await asyncio.wait_for(
             event_loop.run_in_executor(None,
-                                       app.state.ctx.req_handler.handleQuanTracRequest,
-                                       quantrac_request,
+                                       app.state.ctx.req_handler.handleLightGBMRequest,
+                                       request,
                                        "O3_quantrac"),
             timeout=3600000 / 1000.0
         )
@@ -178,16 +179,16 @@ async def predict_o3_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequ
 
 @app.post(
     "/predict-co-from-quantrac-using-lightgbm",
-    response_model=QuanTracResponse,
+    response_model=PredictionResponse,
     description="Predict CO values from QuanTrac data using LightGBM models"
 )
-async def predict_co_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
+async def predict_co_from_quantrac_using_lightgbm(request: QuanTracRequest):
     event_loop = asyncio.get_event_loop()
     try:
         res = await asyncio.wait_for(
             event_loop.run_in_executor(None,
-                                       app.state.ctx.req_handler.handleQuanTracRequest,
-                                       quantrac_request,
+                                       app.state.ctx.req_handler.handleLightGBMRequest,
+                                       request,
                                        "CO_quantrac"),
             timeout=3600000 / 1000.0
         )
@@ -198,16 +199,16 @@ async def predict_co_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequ
 
 @app.post(
     "/predict-so2-from-quantrac-using-lightgbm",
-    response_model=QuanTracResponse,
+    response_model=PredictionResponse,
     description="Predict SO2 values from QuanTrac data using LightGBM models"
 )
-async def predict_so2_from_quantrac_using_lightgbm(quantrac_request: QuanTracSO2Request):
+async def predict_so2_from_quantrac_using_lightgbm(request: QuanTracSO2Request):
     event_loop = asyncio.get_event_loop()
     try:
         res = await asyncio.wait_for(
             event_loop.run_in_executor(None,
-                                       app.state.ctx.req_handler.handleQuanTracRequest,
-                                       quantrac_request,
+                                       app.state.ctx.req_handler.handleLightGBMRequest,
+                                       request,
                                        "SO2_quantrac"),
             timeout=3600000 / 1000.0
         )
@@ -216,3 +217,22 @@ async def predict_so2_from_quantrac_using_lightgbm(quantrac_request: QuanTracSO2
 
     return res
 
+@app.post(
+    "/predict-no-from-cmaq-using-lightgbm",
+    response_model=PredictionResponse,
+    description="Predict NO values from CMAQ data using LightGBM models"
+)
+async def predict_no_from_cmaq_using_lightgbm(request: NOCMAQRequest):
+    event_loop = asyncio.get_event_loop()
+    try:
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleLightGBMRequest,
+                                       request,
+                                       "NO_cmaq"),
+            timeout=3600000 / 1000.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res

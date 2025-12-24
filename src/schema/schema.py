@@ -1,8 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import Any, List, Optional
+from typing import List, Optional
 
-from typing import Optional, List
-from pydantic import BaseModel, Field
+class PredictionResponse(BaseModel):
+    data: Optional[List[float]] = Field(default=None, description="List of predicted values (daily/hourly)")
 
 class VienThamInputData(BaseModel):
     pm25:              Optional[List[float]] = Field(default=None, description="list of daily pm25 values, 7 values")
@@ -29,9 +29,6 @@ class VienThamRequest(BaseModel):
     n_future: int = Field(default=None, description="n_future")
     data: VienThamInputData = Field(default=None, description="VienTham input data")
 
-class VienThamResponse(BaseModel):
-    data: Optional[List[float]] = Field(default=None, description="List of daily predicted values")
-
 class CMAQInputData(BaseModel):
     pm25:    Optional[List[float]] = Field(default=None, description="list of hourly pm25 values, 168 values")
     pm10:    Optional[List[float]] = Field(default=None, description="list of hourly pm10 values, 168 values")
@@ -43,9 +40,6 @@ class CMAQInputData(BaseModel):
 class CMAQRequest(BaseModel):
     n_future: int = Field(default=None, description="n_future")
     data: CMAQInputData = Field(default=None, description="VienTham input data")
-
-class CMAQResponse(BaseModel):
-    data: Optional[List[float]] = Field(default=None, description="List of hourly predicted values")
 
 class QuanTracInputData(BaseModel):
     date:        Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
@@ -60,9 +54,6 @@ class QuanTracInputData(BaseModel):
 class QuanTracRequest(BaseModel):
     data: QuanTracInputData = Field(default=None, description="QuanTrac input data")
 
-class QuanTracResponse(BaseModel):
-    data: Optional[List[float]] = Field(default=None, description="List of 72 predicted values")
-
 class QuanTracSO2InputData(BaseModel):
     date:        Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
     no2:         Optional[List[float]] = Field(default=None, description="list of no2 values, 73 values")
@@ -74,4 +65,14 @@ class QuanTracSO2InputData(BaseModel):
 
 class QuanTracSO2Request(BaseModel):
     data: QuanTracSO2InputData = Field(default=None, description="QuanTrac SO2 input data")
+
+class NOCMAQInputData(BaseModel):
+    date:        Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
+    no2:         Optional[List[float]] = Field(default=None, description="list of no2 values, 73 values")
+    no:          Optional[List[float]] = Field(default=None, description="list of no values, 73 values")
+    o3:          Optional[List[float]] = Field(default=None, description="list of o3 values, 73 values")
+    station_id:  Optional[List[int]] = Field(default=None, description="list of station values, 73 values")
+
+class NOCMAQRequest(BaseModel):
+    data: NOCMAQInputData = Field(default=None, description="NO CMAQ input data")
 
