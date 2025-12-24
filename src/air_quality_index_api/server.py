@@ -139,7 +139,7 @@ async def predict_no_from_cmaq_using_lstms2s_lstm(cmaq_request: CMAQRequest):
 @app.post(
     "/predict-no2-from-quantrac-using-lightgbm",
     response_model=CMAQResponse,
-    description="Predict NO values from CMAQ data using LSTM-Seq2Seq and LSTM models"
+    description="Predict NO2 values from QuanTrac data using LightGBM models"
 )
 async def predict_no2_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
     event_loop = asyncio.get_event_loop()
@@ -149,6 +149,46 @@ async def predict_no2_from_quantrac_using_lightgbm(quantrac_request: QuanTracReq
                                        app.state.ctx.req_handler.handleQuanTracRequest,
                                        quantrac_request,
                                        "NO2_quantrac"),
+            timeout=3600000 / 1000.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res
+
+@app.post(
+    "/predict-o3-from-quantrac-using-lightgbm",
+    response_model=CMAQResponse,
+    description="Predict O3 values from QuanTrac data using LightGBM models"
+)
+async def predict_o3_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
+    event_loop = asyncio.get_event_loop()
+    try:
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleQuanTracRequest,
+                                       quantrac_request,
+                                       "O3_quantrac"),
+            timeout=3600000 / 1000.0
+        )
+    except asyncio.TimeoutError:
+        raise HTTPException(status_code=504, detail="Prediction timed out")
+
+    return res
+
+@app.post(
+    "/predict-co-from-quantrac-using-lightgbm",
+    response_model=CMAQResponse,
+    description="Predict CO values from QuanTrac data using LightGBM models"
+)
+async def predict_co_from_quantrac_using_lightgbm(quantrac_request: QuanTracRequest):
+    event_loop = asyncio.get_event_loop()
+    try:
+        res = await asyncio.wait_for(
+            event_loop.run_in_executor(None,
+                                       app.state.ctx.req_handler.handleQuanTracRequest,
+                                       quantrac_request,
+                                       "CO_quantrac"),
             timeout=3600000 / 1000.0
         )
     except asyncio.TimeoutError:
