@@ -63,3 +63,15 @@ class QuanTracRequest(BaseModel):
 class QuanTracResponse(BaseModel):
     data: Optional[List[float]] = Field(default=None, description="List of 72 predicted values")
 
+class QuanTracSO2InputData(BaseModel):
+    date:        Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
+    no2:         Optional[List[float]] = Field(default=None, description="list of no2 values, 73 values")
+    pm25:        Optional[List[float]] = Field(default=None, description="list of pm25 values, 73 values")
+    o3:          Optional[List[float]] = Field(default=None, description="list of o3 values, 73 values")
+    co:          Optional[List[float]] = Field(default=None, description="list of co values, 73 values")
+    so2:         Optional[List[float]] = Field(default=None, description="list of so2 values, 73 values")
+    station_id:  Optional[List[int]] = Field(default=None, description="list of station values, 73 values")
+
+class QuanTracSO2Request(BaseModel):
+    data: QuanTracSO2InputData = Field(default=None, description="QuanTrac SO2 input data")
+

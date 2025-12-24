@@ -124,9 +124,11 @@ class RequestHandler():
             "PM25_quantrac",
             "O3_quantrac",
             "CO_quantrac",
-            "Temperature_quantrac",
-            "Humid_quantrac",
         ]
+        if target_col == "SO2_quantrac":
+            BASE_FEATURE_COLS += ["SO2_quantrac"]
+        else:
+            BASE_FEATURE_COLS += ["Temperature_quantrac", "Humid_quantrac"]
         LAG_STEPS = [3, 6, 12, 24, 48, 72]
         ROLL_WINDOWS = [3, 6, 12, 24, 48, 72]
         HORIZONS = [1, 24, 48, 72]
