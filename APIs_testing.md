@@ -1,3 +1,9 @@
+# APIs testing
+
+## Sequence-to-Sequence models
+
+Receive 72 input values
+
 ```
 curl 127.0.0.1:8000/predict-pm25-from-vientham-using-lstms2s-lstm \
 -X POST \
@@ -118,6 +124,10 @@ curl 127.0.0.1:8000/predict-no-from-cmaq-using-lstms2s-lstm \
     }
 EOF
 ```
+
+## LightGBM models
+
+Receive 73 input values
 
 ```
 curl 127.0.0.1:8000/predict-no2-from-quantrac-using-lightgbm \
