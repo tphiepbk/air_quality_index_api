@@ -76,3 +76,34 @@ class NOCMAQInputData(BaseModel):
 class NOCMAQRequest(BaseModel):
     data: NOCMAQInputData = Field(default=None, description="NO CMAQ input data")
 
+class QuanTracCMAQInputData(BaseModel):
+    date:                 Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
+    no2_quantrac:         Optional[List[float]] = Field(default=None, description="list of no2_quantrac values, 73 values")
+    pm25_quantrac:        Optional[List[float]] = Field(default=None, description="list of pm25_quantrac values, 73 values")
+    o3_quantrac:          Optional[List[float]] = Field(default=None, description="list of o3_quantrac values, 73 values")
+    co_quantrac:          Optional[List[float]] = Field(default=None, description="list of co_quantrac values, 73 values")
+    temperature_quantrac: Optional[List[float]] = Field(default=None, description="list of temperature_quantrac values, 73 values")
+    humid_quantrac:       Optional[List[float]] = Field(default=None, description="list of humid_quantrac values, 73 values")
+    no2_cmaq:             Optional[List[float]] = Field(default=None, description="list of no2_cmaq values, 73 values")
+    o3_cmaq:              Optional[List[float]] = Field(default=None, description="list of o3_cmaq values, 73 values")
+    so2_cmaq:             Optional[List[float]] = Field(default=None, description="list of so2_cmaq values, 73 values")
+    station_id:           Optional[List[int]] = Field(default=None, description="list of station values, 73 values")
+
+class QuanTracCMAQRequest(BaseModel):
+    data: QuanTracCMAQInputData = Field(default=None, description="QuanTrac CMAQ input data")
+
+class QuanTracCMAQSO2InputData(BaseModel):
+    date:                 Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
+    no2_quantrac:         Optional[List[float]] = Field(default=None, description="list of no2_quantrac values, 73 values")
+    pm25_quantrac:        Optional[List[float]] = Field(default=None, description="list of pm25_quantrac values, 73 values")
+    o3_quantrac:          Optional[List[float]] = Field(default=None, description="list of o3_quantrac values, 73 values")
+    co_quantrac:          Optional[List[float]] = Field(default=None, description="list of co_quantrac values, 73 values")
+    so2_quantrac:         Optional[List[float]] = Field(default=None, description="list of so2_quantrac values, 73 values")
+    no2_cmaq:             Optional[List[float]] = Field(default=None, description="list of no2_cmaq values, 73 values")
+    o3_cmaq:              Optional[List[float]] = Field(default=None, description="list of o3_cmaq values, 73 values")
+    so2_cmaq:              Optional[List[float]] = Field(default=None, description="list of so2_cmaq values, 73 values")
+    station_id:           Optional[List[int]] = Field(default=None, description="list of station values, 73 values")
+
+class QuanTracCMAQSO2Request(BaseModel):
+    data: QuanTracCMAQSO2InputData = Field(default=None, description="QuanTrac CMAQ input data")
+
