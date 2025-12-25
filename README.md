@@ -37,3 +37,7 @@ make run-server CONTAINER_NAME=testcontainer PORT=8080 IMAGE_NAME=test IMAGE_TAG
 ## Online repository
 
 The Docker image is available at: <https://hub.docker.com/repository/docker/tphiepbk/air_quality_index_api/general>
+
+## API testing
+
+Please refer to [APIs_testing](./APIs_testing.md) to see all the CURL commands with sample data
