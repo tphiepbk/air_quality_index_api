@@ -52,8 +52,13 @@ class RequestHandler():
         info("{}: predicted_pm25.shape = \n{}", func_name, predicted_pm25.shape)
         info("{}: predicted_pm25 = \n{}", func_name, predicted_pm25)
 
+        # Flatten, convert to list
+        predicted_pm25_flatten = np.squeeze(predicted_pm25, axis=-1)
+        info("{}: predicted_pm25_flatten.shape = \n{}", func_name, predicted_pm25_flatten.shape)
+        info("{}: predicted_pm25_flatten = \n{}", func_name, predicted_pm25_flatten)
+
         # Proceed the result
-        return PredictionResponse(data=predicted_pm25)
+        return PredictionResponse(data=predicted_pm25_flatten)
 
     def handleCMAQRequest(self, cmaq_request, reduction_model_name, prediction_model_name):
         # Logger
@@ -86,11 +91,16 @@ class RequestHandler():
                                          n_future=n_future,
                                          reduction_model_name=reduction_model_name,
                                          prediction_model_name=prediction_model_name).predict()
-        info("{}: predicted_pm25.shape = \n{}", func_name, predicted_no.shape)
-        info("{}: predicted_pm25 = \n{}", func_name, predicted_no)
+        info("{}: predicted_no.shape = \n{}", func_name, predicted_no.shape)
+        info("{}: predicted_no = \n{}", func_name, predicted_no)
+
+        # Flatten, convert to list
+        predicted_no_flatten = np.squeeze(predicted_no, axis=-1)
+        info("{}: predicted_pm25_flatten.shape = \n{}", func_name, predicted_no_flatten.shape)
+        info("{}: predicted_pm25_flatten = \n{}", func_name, predicted_no_flatten)
 
         # Proceed the result
-        return PredictionResponse(data=predicted_no)
+        return PredictionResponse(data=predicted_no_flatten)
 
     def handleLightGBMRequest(self, request, target_col):
         # Logger
