@@ -143,8 +143,8 @@ class RequestHandler():
             ]
 
         # Define times
-        LAG_STEPS = [3, 6, 12, 24, 48, 72]
-        ROLL_WINDOWS = [3, 6, 12, 24, 48, 72]
+        LAG_STEPS = [3, 6, 12, 24, 48, 71]
+        ROLL_WINDOWS = [3, 6, 12, 24, 48, 71]
         HORIZONS = [1, 24, 48, 72]
 
         # Model path
@@ -167,7 +167,11 @@ class RequestHandler():
         info("{}: df_embedded.columns: {}", func_name, list(df_embedded.columns))
 
         # Drop station and date before prediciting
-        df_final = df_embedded.drop(columns=["station_id", "date", target_col])
+        df_drop_station_date = df_embedded.drop(columns=["station_id", "date", target_col])
+
+        # Dropna
+        df_final = df_drop_station_date.dropna()
+        info("{}: df_final: \n{}", func_name, df_final)
 
         # Start the prediction
         predicted_values = []
@@ -234,8 +238,8 @@ class RequestHandler():
             BASE_FEATURE_COLS += ["Temperature_quantrac", "Humid_quantrac"]
 
         # Define times
-        LAG_STEPS = [3, 6, 12, 24, 48, 72]
-        ROLL_WINDOWS = [3, 6, 12, 24, 48, 72]
+        LAG_STEPS = [3, 6, 12, 24, 48, 71]
+        ROLL_WINDOWS = [3, 6, 12, 24, 48, 71]
         HORIZONS = [1, 24, 48, 72]
 
         # Model path
@@ -258,7 +262,11 @@ class RequestHandler():
         info("{}: df_embedded.columns: {}", func_name, list(df_embedded.columns))
 
         # Drop station and date before prediciting
-        df_final = df_embedded.drop(columns=["station_id", "date", target_col])
+        df_drop_station_date = df_embedded.drop(columns=["station_id", "date", target_col])
+
+        # Dropna
+        df_final = df_drop_station_date.dropna()
+        info("{}: df_final: \n{}", func_name, df_final)
 
         # Start the prediction
         predicted_values = []
