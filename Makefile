@@ -1,6 +1,6 @@
 PORT = 8000
 IMAGE_NAME = "tphiepbk/air_quality_index_api"
-IMAGE_TAG = "1.3"
+IMAGE_TAG = "1.4"
 CONTAINER_NAME = "air_quality_index_api"
 
 run-local:

@@ -10,6 +10,8 @@ import numpy as np
 from src.logger.logger import info
 
 def mice(df, method=None):
+    func_name = "mice()"
+    info("{}: is called", func_name)
     if method is not None:
         assert method in ["random_forest", "extra_trees"]
     df_columns = df.columns

@@ -12,6 +12,7 @@ from src.schema.schema import PredictionResponse, QuanTracRequest, QuanTracSO2Re
 from src.logger.logger import info
 from src.lightgbm_wrapper.feature_engineer import add_time_features, add_lag_features, add_rolling_features
 from src.lightgbm_wrapper.station_embedding import attach_station_embedding
+from src.preprocessor.data_utils import mice
 
 class RequestHandler():
     def __init__(self):
@@ -133,6 +134,13 @@ class RequestHandler():
         info("{}: df: \n{}", func_name, df)
         info("{}: df.columns: {}", func_name, list(df.columns))
 
+        # Fill missing
+        df = df.replace(-1, np.nan)
+        df_imputed = mice(df.drop(columns=["date", "station_id"]))
+        df_imputed["date"] = df.loc[:, "date"]
+        df_imputed["station_id"] = df.loc[:, "station_id"]
+        info("{}: df_imputed: \n{}", func_name, df_imputed)
+
         # Define base features
         if isinstance(request, QuanTracRequest) or isinstance(request, QuanTracSO2Request):
             BASE_FEATURE_COLS = [
@@ -161,7 +169,7 @@ class RequestHandler():
         model_path = os.path.join("models", "lightgbm")
 
         # Processing
-        df_time_feats = add_time_features(df)
+        df_time_feats = add_time_features(df_imputed)
         df_lag_feats = add_lag_features(df_time_feats, group_col="station_id", target_cols=BASE_FEATURE_COLS, lag_steps=LAG_STEPS)
         df_rolling_feats = add_rolling_features(df_lag_feats, group_col="station_id", target_cols=[target_col], windows=ROLL_WINDOWS)
 
@@ -225,6 +233,13 @@ class RequestHandler():
         info("{}: df: \n{}", func_name, df)
         info("{}: df.columns: {}", func_name, list(df.columns))
 
+        # Fill missing
+        df = df.replace(-1, np.nan)
+        df_imputed = mice(df.drop(columns=["date", "station_id"]))
+        df_imputed["date"] = df.loc[:, "date"]
+        df_imputed["station_id"] = df.loc[:, "station_id"]
+        info("{}: df_imputed: \n{}", func_name, df_imputed)
+
         # Define base features
         BASE_FEATURE_COLS = ["NO2_cmaq", "O3_cmaq"]
 
@@ -236,7 +251,7 @@ class RequestHandler():
         model_path = os.path.join("models", "lightgbm")
 
         # Processing
-        df_time_feats = add_time_features(df)
+        df_time_feats = add_time_features(df_imputed)
         df_lag_feats = add_lag_features(df_time_feats, group_col="station_id", target_cols=BASE_FEATURE_COLS, lag_steps=LAG_STEPS)
 
         # Add station embedding
@@ -303,6 +318,13 @@ class RequestHandler():
         info("{}: df: \n{}", func_name, df)
         info("{}: df.columns: {}", func_name, list(df.columns))
 
+        # Fill missing
+        df = df.replace(-1, np.nan)
+        df_imputed = mice(df.drop(columns=["date", "station_id"]))
+        df_imputed["date"] = df.loc[:, "date"]
+        df_imputed["station_id"] = df.loc[:, "station_id"]
+        info("{}: df_imputed: \n{}", func_name, df_imputed)
+
         # Define base features
         BASE_FEATURE_COLS = [
             "NO2_quantrac",
@@ -327,7 +349,7 @@ class RequestHandler():
         model_path = os.path.join("models", "lightgbm", "pmcmaq")
 
         # Processing
-        df_time_feats = add_time_features(df)
+        df_time_feats = add_time_features(df_imputed)
         df_lag_feats = add_lag_features(df_time_feats, group_col="station_id", target_cols=BASE_FEATURE_COLS, lag_steps=LAG_STEPS)
         df_rolling_feats = add_rolling_features(df_lag_feats, group_col="station_id", target_cols=[target_col], windows=ROLL_WINDOWS)
 
