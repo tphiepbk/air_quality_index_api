@@ -69,7 +69,6 @@ class QuanTracSO2Request(BaseModel):
 class NOCMAQInputData(BaseModel):
     date:        Optional[List[str]] = Field(default=None, description="list of date values, 73 values")
     no2:         Optional[List[float]] = Field(default=None, description="list of no2 values, 73 values")
-    no:          Optional[List[float]] = Field(default=None, description="list of no values, 73 values")
     o3:          Optional[List[float]] = Field(default=None, description="list of o3 values, 73 values")
     station_id:  Optional[List[int]] = Field(default=None, description="list of station values, 73 values")
 

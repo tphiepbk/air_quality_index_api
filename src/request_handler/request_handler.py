@@ -202,6 +202,77 @@ class RequestHandler():
         # Proceed the result
         return PredictionResponse(data=filled_predicted_values)
 
+    def handleLightGBMNOCMAQRequest(self, request, target_col):
+        # Logger
+        func_name = "RequestHandler.handleLightGBMNOCMAQRequest()"
+        info("{}: is called", func_name)
+
+        # Read the QuanTrac request
+        df = pd.DataFrame(request.data.model_dump())
+
+        # Convert "date" column to datetime
+        df["date"] = pd.to_datetime(df["date"])
+
+        # Rename columns
+        column_mapper = {}
+        suffix = "_cmaq"
+        for col in df.columns:
+            if col not in ["date", "station_id"]:
+                column_mapper[col] = f"{col.upper()}{suffix}"
+        df = df.rename(column_mapper, axis=1)
+
+        # Print the dataset
+        info("{}: df: \n{}", func_name, df)
+        info("{}: df.columns: {}", func_name, list(df.columns))
+
+        # Define base features
+        BASE_FEATURE_COLS = ["NO2_cmaq", "O3_cmaq"]
+
+        # Define times
+        LAG_STEPS = [3, 6, 12, 24, 48, 71]
+        HORIZONS = [1, 24, 48, 72]
+
+        # Model path
+        model_path = os.path.join("models", "lightgbm")
+
+        # Processing
+        df_time_feats = add_time_features(df)
+        df_lag_feats = add_lag_features(df_time_feats, group_col="station_id", target_cols=BASE_FEATURE_COLS, lag_steps=LAG_STEPS)
+
+        # Add station embedding
+        with open(os.path.join(model_path, f"{target_col}_station_embedding.pkl"), "rb") as no2_emb_file:
+            station_to_embedding = pickle.load(no2_emb_file)
+        df_embedded, _ = attach_station_embedding(df_lag_feats, station_to_embedding, station_col="station_id")
+
+        info("{}: df_embedded: \n{}", func_name, df_embedded)
+        info("{}: df_embedded.columns: {}", func_name, list(df_embedded.columns))
+
+        # Drop station and date before prediciting
+        df_drop_station_date = df_embedded.drop(columns=["station_id", "date"])
+
+        # Dropna
+        df_final = df_drop_station_date.dropna()
+        info("{}: df_final: \n{}", func_name, df_final)
+
+        # Start the prediction
+        predicted_values = []
+        for horizon_h in HORIZONS:
+            model = lgb.Booster(model_file=os.path.join(model_path, f"{target_col}_lightgbm_{horizon_h}h"))
+            predicted_value = model.predict(df_final, num_iteration=getattr(model, "best_iteration", None))[0]
+            print(f"Horizon: {horizon_h}h - predicted: {predicted_value}")
+            predicted_values.append(predicted_value)
+
+        # Create the series of 72 values
+        padded_predicted_values = np.full(shape=72, fill_value=np.nan)
+        for horizon_h, value in zip(HORIZONS, predicted_values):
+            padded_predicted_values[horizon_h-1] = value
+        info("{}: padded_predicted_values: \n{}", func_name, padded_predicted_values)
+        filled_predicted_values = pd.Series(padded_predicted_values).ffill().to_numpy()
+        info("{}: filled_predicted_values: \n{}", func_name, filled_predicted_values)
+
+        # Proceed the result
+        return PredictionResponse(data=filled_predicted_values)
+
     def handleLightGBMQuanTracCMAQRequest(self, request, target_col):
         # Logger
         func_name = "RequestHandler.handleLightGBMQuanTracCMAQRequest()"

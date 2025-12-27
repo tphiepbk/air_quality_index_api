@@ -227,7 +227,7 @@ async def predict_no_from_cmaq_using_lightgbm(request: NOCMAQRequest):
     try:
         res = await asyncio.wait_for(
             event_loop.run_in_executor(None,
-                                       app.state.ctx.req_handler.handleLightGBMRequest,
+                                       app.state.ctx.req_handler.handleLightGBMNOCMAQRequest,
                                        request,
                                        "NO_cmaq"),
             timeout=3600000 / 1000.0
